@@ -1,0 +1,24 @@
+# FILE		: data_producer-2
+# PROJECT	: Histogram System
+# PROGRAMMER	: Eunyoung Kim, Yujin Jeong
+# FIRST VERSION	: 2023-04-08
+# DESCRIPTION	: This makefile is to compile Histogram System application
+
+
+# FINAL BINARY Target
+./bin/DP-2 : ./obj/dp-2.o
+	cc ./obj/dp-2.o -o ./bin/DP-2
+#
+# =======================================================
+#                     Dependencies =======================================================                     
+./obj/dp-2.o : ./src/dp-2.c
+	cc -c ./src/dp-2.c -o ./obj/dp-2.o
+
+#
+# =======================================================
+# Other targets
+# =======================================================                     
+clean:
+	rm -f ./bin/DP-2*
+	rm -f ./obj/dp-2.*
+	rm -f ./src/dp-2.c~
