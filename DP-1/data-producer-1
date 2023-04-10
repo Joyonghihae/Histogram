@@ -7,11 +7,11 @@
 
 # FINAL BINARY Target
 ./bin/DP-1 : ./obj/dp-1.o
-	cc ./obj/dp-1.o -o ./bin/DP-1
+	cc ./obj/dp-1.o -o ./bin/DP-1 
 #
 # =======================================================
 #                     Dependencies =======================================================                     
-./obj/dp-1.o : ./src/dp-1.c
+./obj/dp-1.o : ./src/dp-1.c ./inc/common.h
 	cc -c ./src/dp-1.c -o ./obj/dp-1.o
 
 #
