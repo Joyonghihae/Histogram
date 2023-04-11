@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
         sprintf(dp2_pid_str, "%d", dp2_pid); 
         sprintf(dp1_pid_str, "%d", dp1_pid); 
         sprintf(shmID_str, "%d", shmID); 
-        execlp("../../Common/bin/DC", "DC", dp2_pid_str, dp1_pid_str, shmID_str, NULL); // execute DC with arguments
+        execlp("../../DC/bin/DC", "DC", dp2_pid_str, dp1_pid_str, shmID_str, NULL); // execute DC with arguments
         exit(1);
     }
 

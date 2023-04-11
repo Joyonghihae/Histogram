@@ -12,6 +12,7 @@
  int shmid;
 
 
+
 int main(int argc, char *argv[]) {
 
     int read;
@@ -32,20 +33,9 @@ int main(int argc, char *argv[]) {
     signal(SIGINT, int_handler);
     signal(SIGALRM, allPowerfulSignalHandler);
     
-   
-    if ((shmid = shmget (shmID, SHM_SIZE, 0)) == -1) 
-	{
-		// note: you could try setting up your own fork/exec here
-		// to launch the 2nd app!!
-
-		printf ("(DP) Shared-Memory doesn't exist. run the PRODUCER!\n");
-		return 2;
-	}
-
-    printf ("(DC) Our Shared-Memory ID is %d\n", shmid);
 
     // DC application will attach itself to the shared memory
-    char *shm_ptr = (char *) shmat(shmid, NULL, 0);
+    char *shm_ptr = (char *) shmat(shmID, NULL, 0);
     if (shm_ptr == (char*) -1) {
         perror("shmat");
         exit(1);
@@ -59,7 +49,7 @@ int main(int argc, char *argv[]) {
         // read current buffer index from shared memory
     unsigned int* index_ptr = (unsigned int*) (shm_ptr + SHM_SIZE - 2 * sizeof(int));
     unsigned int index = *index_ptr;
-
+      printf("\nDC Semaphore id : %d\n",semid);
 
     while(1){
         // wait for semaphore

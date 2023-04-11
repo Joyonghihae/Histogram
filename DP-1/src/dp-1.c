@@ -86,7 +86,7 @@ int main() {
     else if (p == 0) 	
     {
         // pass sharedMemoryID
-        execl ("../../Common/bin/DP-2", "DP-2", shmID_str,NULL);
+        execl ("../../DP-2/bin/DP-2", "DP-2", shmID_str,NULL);
         exit(1);
        
     }
