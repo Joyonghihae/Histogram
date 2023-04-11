@@ -16,11 +16,11 @@
 #include <stdlib.h>
 #include <signal.h>
 
-void alarmHandler(int signal_number);
-
 
 #else
 extern struct sembuf acquire_operation;
 extern struct sembuf release_operation;
 
 #endif
+void alarmHandler(int signal_number);
+void allPowerfulSignalHandler (int signal_number);

@@ -18,7 +18,13 @@
 #include <stdlib.h>
 #include <signal.h>
 
+#define DP1_PID
+#define DP2_PID
+
+
+#define SHM_SIZE 258 // for 256 char buffer and 2 indices
 struct sembuf acquire_operation = { 0, -1, SEM_UNDO };
 struct sembuf release_operation = { 0, 1, SEM_UNDO };
+void int_handler(int sig);
 
 #endif

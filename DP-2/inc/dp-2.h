@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <signal.h>
 
+#define SHM_SIZE 258 // for 256 char buffer and 2 indices
 #define str_size 16
 struct sembuf acquire_operation = { 0, -1, SEM_UNDO };
 struct sembuf release_operation = { 0, 1, SEM_UNDO };

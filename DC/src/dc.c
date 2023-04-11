@@ -5,39 +5,61 @@
 // DESCRIPTION   : 
 
 #include "../inc/dc.h"
+ int shmID;
+ int dp1_pid;
+ int dp2_pid;
+ char* shm_ptr;
+ int shmid;
+
 
 int main(int argc, char *argv[]) {
 
     int read;
-    signal (SIGINT, alarmHandler);
+    char buffer[SHM_SIZE];
+    int x;
 
     if (argc != 4) {
         exit(1);
     }
 
-    int semid;
-    int shmID = atoi(argv[3]); 
-    int dp1_pid = atoi(argv[2]);
-    int dp2_pid = atoi(argv[1]); 
+    shmID = atoi(argv[3]); 
+    dp1_pid = atoi(argv[2]);
+    dp2_pid = atoi(argv[1]); 
     printf("share memory: %d\n", shmID);
     printf("dp-1 process ID:%d\n", dp1_pid);
     printf("dp-2 process ID:%d\n", dp2_pid);
+    
+    signal(SIGINT, int_handler);
+    signal(SIGALRM, allPowerfulSignalHandler);
+    
+   
+    if ((shmid = shmget (shmID, SHM_SIZE, 0)) == -1) 
+	{
+		// note: you could try setting up your own fork/exec here
+		// to launch the 2nd app!!
+
+		printf ("(DP) Shared-Memory doesn't exist. run the PRODUCER!\n");
+		return 2;
+	}
+
+    printf ("(DC) Our Shared-Memory ID is %d\n", shmid);
 
     // DC application will attach itself to the shared memory
-    char* shm_ptr = (char*) shmat(shmID, NULL, 0);
+    char *shm_ptr = (char *) shmat(shmid, NULL, 0);
     if (shm_ptr == (char*) -1) {
         perror("shmat");
         exit(1);
     }
 
-    //initialize semaphore
-    semid = semget(shmID, 1, 0666 | IPC_CREAT);
-    if (semid == -1)
-	{
-	  printf ("Couldn't get semaphores!\n");
-	  exit (1);
-	}
-    int counts[20] = {0};
+    // read semaphore ID from shared memory
+    int* semid_ptr = (int*) (shm_ptr + SHM_SIZE - sizeof(int));
+    int semid = *semid_ptr;
+
+
+        // read current buffer index from shared memory
+    unsigned int* index_ptr = (unsigned int*) (shm_ptr + SHM_SIZE - 2 * sizeof(int));
+    unsigned int index = *index_ptr;
+
 
     while(1){
         // wait for semaphore
@@ -45,20 +67,20 @@ int main(int argc, char *argv[]) {
             perror ("Can't end critical region\n");
             break;
         }
-         
+        
 
-        char check = shm_ptr[read];
-        read++;
-
-        if(read >= 256){
-            read = 0;
+        // access the current index of the shared memory buffer
+        index = *index_ptr;
+        
+        if(index == 256)
+        {
+            index = 0;
         }
 
-        counts[check - 'A']++;
-
+        
         for (int i = 0; i < 20; i++) {
-            printf("%c-%03d ", i + 'A', counts[i]);
-            for (int j = 0; j < counts[i]; j++) {
+            printf("%c-%03d ", i + 'A', buffer[i]);
+            for (int j = 0; j < buffer[i]; j++) {
                 if (j % 100 == 0) {
                     printf("*");
                 } else if (j % 10 == 0) {
@@ -70,16 +92,30 @@ int main(int argc, char *argv[]) {
             printf("\n");
         }
 
+        index += 1;
 
+        // update the current index of the shared memory buffer
+        *index_ptr = index;
+
+        if (semop (semid, &release_operation, 1) == -1) 
+        {
+            printf ("RELEASE\n");
+            break;
+        }
         sleep(10);
     }
 
+    shmdt (semid_ptr);
     shmdt (shm_ptr);
-    shmctl (shmID, IPC_RMID, 0);
-
    return 0;
 }
 
-
-
-
+void int_handler(int sig) {
+    kill(dp1_pid, SIGINT);
+    kill(dp2_pid, SIGINT);
+    shmdt(shm_ptr);
+    shmctl(shmID, IPC_RMID, NULL);
+    semctl(shmID, 0, IPC_RMID);
+    printf("Shazam!!\n");
+    exit(0);
+}
