@@ -8,7 +8,7 @@
 
 #define SHM_SIZE 258 // for 256 char buffer and 2 indices
 #define str_size 16
-#include "../inc/common.h"
+#include "../../Common/sinc/common.h"
 
 
 
@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
     unsigned int index = *index_ptr;
 
 
-    while(signal(SIGINT,sigint_handler))
+   for(int x = 0; x<15;x++)
     {
         if (semop (semid, &acquire_operation, 1) == -1) 
         {
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
         // generate random letter and write to buffer
         char random_letter = (char) ((rand() % 20) + 'A');
         shm_ptr[index] = random_letter;
-        printf("%d : %c\n", index, random_letter);
+        printf("DC2 - %d : %c\n", index, random_letter);
 
         index += 1;
 

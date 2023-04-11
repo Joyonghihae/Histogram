@@ -9,7 +9,7 @@
 #include <signal.h>
 
 #define SHM_SIZE 258 // for 256 char buffer and 2 indices
-#include "../inc/common.h"
+#include "../../Common/sinc/common.h"
 
 //!!! [256]and[257] is read and write buffer!
 // -> update 256 and 257 every time
@@ -110,7 +110,7 @@ int main() {
     int* index_ptr = (int*) (shm_ptr + SHM_SIZE - 2*sizeof(int));
     int index = *index_ptr;
 
-    while(signal(SIGINT,sigint_handler)) // needs to change get SIGINT??
+    for(int x = 0; x<15;x++) // needs to change get SIGINT??
     {   
         
         if (semop (semid, &acquire_operation, 1) == -1)     // fix to ==1? 
