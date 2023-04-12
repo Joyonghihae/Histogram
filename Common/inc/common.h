@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <signal.h>
 
+<<<<<<< HEAD
 #define CHAR_SIZE 256
 void alarmHandler(int signal_number);
 void allPowerfulSignalHandler (int signal_number);
@@ -25,3 +26,8 @@ typedef struct dataStruc
    char character[CHAR_SIZE];
     int semid;
 } RANDOMDATA;
+=======
+
+void alarmHandler(int signal_number);
+void allPowerfulSignalHandler (int signal_number);
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb

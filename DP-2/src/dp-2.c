@@ -15,7 +15,17 @@
 //     exit(0);
     
 // }
+<<<<<<< HEAD
 
+=======
+typedef struct dataStruc
+{
+    int pos;
+    char readWrite_idx[2];
+	char randomChar[SHM_SIZE];
+    int semid;
+} RANDOMDATA;
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
 
 int main(int argc, char *argv[]) {
 
@@ -30,7 +40,11 @@ int main(int argc, char *argv[]) {
     }
 
     shmID = atoi(argv[1]);
+<<<<<<< HEAD
     printf("\nDP2 share: %d\n\n",shmID);
+=======
+    
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
 
     pid_t dp2_pid = getpid();   
     pid_t dp1_pid = getppid(); 
@@ -41,9 +55,19 @@ int main(int argc, char *argv[]) {
         printf ("(CONSUMER) Cannot attach to Shared-Memory!\n");
         exit(1);
     }
+<<<<<<< HEAD
  
     // read semaphore ID from shared memory
     int semID = data->semid;
+=======
+    int ind = data->readWrite_idx[1];
+
+    // read semaphore ID from shared memory
+    // int* semid_ptr = (int*) (data + SHM_SIZE - sizeof(int));
+    // int semid = *semid_ptr;
+    int semid = data->semid;
+    printf("\nDP-2 Semaphore id1 : %d\n",data->semid);
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
 
     printf("semid address: %p \n", &data->semid);
     printf("pos address: %p \n", &data->pos);
@@ -63,7 +87,13 @@ int main(int argc, char *argv[]) {
         sprintf(dp2_pid_str, "%d", dp2_pid); 
         sprintf(dp1_pid_str, "%d", dp1_pid); 
         sprintf(shmID_str, "%d", shmID); 
+<<<<<<< HEAD
         execl("../../DC/bin/DC", "DC", dp2_pid_str, dp1_pid_str, shmID_str, NULL); // execute DC with arguments
+=======
+        printf("ready to send!!!!!!!!!!");
+        execl("../../DC/bin/DC", "DC", dp2_pid_str, dp1_pid_str, shmID_str, NULL); // execute DC with arguments
+        printf("fail!!!!!!!!");
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
         exit(1);
     }
 
@@ -71,12 +101,18 @@ int main(int argc, char *argv[]) {
     // read current buffer index from shared memory
     // unsigned int* index_ptr = (unsigned int*) (shm_ptr + SHM_SIZE - 2 * sizeof(int));
     // unsigned int index = *index_ptr;
+<<<<<<< HEAD
     
     int readIndex = data->readWrite_idx[0];
     int writeIndex = data->readWrite_idx[1];
 
 
+=======
+    int writeIndex = data->readWrite_idx[0];
+    int readIndex = data->readWrite_idx[1];
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
 
+    printf("\nDP-2 Semaphore id2 : %d\n",data->semid);
 
     while(1)
     {
@@ -88,7 +124,21 @@ int main(int argc, char *argv[]) {
             exit (4);
         }
         // access the current index of the shared memory buffer
+<<<<<<< HEAD
         //data->readWrite_idx[1] = data->pos;
+=======
+        //index = *index_ptr;
+        data->pos = data->readWrite_idx[1];
+        
+        // set Write index to current index
+        //*(shm_ptr + 256) = index;
+
+        // set Write index to current index
+        //writeIndex = index;
+        // set Write index to current index
+        //writeIndex = index;
+        
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
         if(data->pos == 256)
         {
             data->pos = 0;
@@ -112,6 +162,10 @@ int main(int argc, char *argv[]) {
         data->pos++;
 
         // update the current index of the shared memory buffer
+<<<<<<< HEAD
+=======
+        //*index_ptr = index;
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
         data->readWrite_idx[1] = data->pos;
 
         // sleep 1/20 second
@@ -121,11 +175,19 @@ int main(int argc, char *argv[]) {
       * release the semaphore - we're leaving the critical region
       */
  
+<<<<<<< HEAD
      if (semop (data->semid, &release_operation, 1) == -1) 
      {
        printf ("     (USER2) RELEASE\n");
        break;
      }
+=======
+	  if (semop (data->semid, &release_operation, 1) == -1) 
+	  {
+	    printf ("     (USER2) RELEASE\n");
+	    break;
+	  }
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
 
     }
 
@@ -135,7 +197,15 @@ int main(int argc, char *argv[]) {
     // shmdt (shm_ptr);
     // shmdt (semid_ptr);
     // shmctl(shmID, IPC_RMID, 0);
+<<<<<<< HEAD
+=======
+    return 0;
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
     return 0;
 
-
 }
+
+<<<<<<< HEAD
+}
+=======
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb

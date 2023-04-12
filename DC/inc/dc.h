@@ -22,6 +22,20 @@
 #define ASCII 20
 #define SHM_SIZE 272 
 
+#define CHAR_SIZE 256
+#define SHM_SIZE 272 
+
+<<<<<<< HEAD
+#ifndef __dc_H__
+#define __dc_H__
+unsigned short init_values[1] = { 1 };
+
+struct sembuf acquire_operation = { 0, -1, SEM_UNDO };
+struct sembuf release_operation = { 0, 1, SEM_UNDO };
+
+=======
+void int_handler(int sig);
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
 
 #ifndef __dc_H__
 #define __dc_H__

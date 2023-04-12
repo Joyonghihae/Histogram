@@ -17,13 +17,28 @@
     
 // }
 
+<<<<<<< HEAD
+=======
+typedef struct dataStruc
+{
+    unsigned int pos;
+    int readWrite_idx[2];
+	char randomChar[CHAR_SIZE];
+    int semid;
+} RANDOMDATA;
+
+
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
 int main() {
     //shared memory var
     int shmID = 0;
     key_t shmem_key;
     pid_t p;
     RANDOMDATA *data;
+<<<<<<< HEAD
     int semID = 0;
+=======
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
     //unsigned int index = 0;
 
     //signal (SIGINT, allPowerfulSignalHandler);
@@ -40,15 +55,24 @@ int main() {
 
 
     // try to attach to existing shared memory
+<<<<<<< HEAD
     shmID = shmget(shmem_key, sizeof(RANDOMDATA), 0);
    
     if (shmID == -1) { 
         // create new shared memory
         shmID = shmget(shmem_key, sizeof(RANDOMDATA), IPC_CREAT | 0660);
+=======
+    shmID = shmget(shmem_key, SHM_SIZE, 0);
+    printf("shared id: %d", shmID);
+    if (shmID == -1) { 
+        // create new shared memory
+        shmID = shmget(shmem_key, SHM_SIZE, IPC_CREAT | 0660);
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
         if (shmID == -1) { 
             
             return 2;
         }
+<<<<<<< HEAD
     }
      printf("shared id: %d\n", shmID);
     // attach the shared memory segment to DP-1
@@ -58,18 +82,38 @@ int main() {
         exit(1);
     }
    
+=======
+    }
+
+    // attach the shared memory segment to DP-1
+    data = (RANDOMDATA*) shmat(shmID, NULL, 0);
+    if (data == NULL) {
+        printf("ERRROROROR");
+        exit(1);
+    }
+   
+
+    printf("1here2\n");
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
     // convert shared memory ID 
     char shmID_str[16] = "";
     sprintf(shmID_str, "%d", shmID);
 
     //SEMAPHORE
+<<<<<<< HEAD
     semID = semget (IPC_PRIVATE, 1, IPC_CREAT | 0666);
    if (semID == -1)
    {
+=======
+    data->semid = semget (IPC_PRIVATE, 1, IPC_CREAT | 0666);
+	if (data->semid == -1)
+	{
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
         printf("DP-1 semaphore error");
        exit (1);
    }
 
+<<<<<<< HEAD
     data->semid = semID;
     printf("semid address: %p \n", &data->semid);
     printf("pos address: %p \n", &data->pos);
@@ -80,6 +124,20 @@ int main() {
         perror("DP-1 semaphore error");
        exit (1);
    }
+=======
+  printf("1here3\n");
+    // Write semaphore ID to shared memory
+    // int* semid_ptr = (int*) (data + SHM_SIZE - sizeof(int));
+    // *semid_ptr = semid;
+   
+    // initialize the semaphore
+    if (semctl (data->semid, 0, SETALL, init_values) == -1) 
+	{
+        printf("DP-1 semaphore error");
+	    exit (1);
+	}
+    printf("\nDP-1 Semaphore id : %d\n",data->semid);
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
 
 
     //lanch DP-2
@@ -97,6 +155,7 @@ int main() {
     }
 
     int max_idx = 0;
+<<<<<<< HEAD
     int readIndex = data->readWrite_idx[0];
     int writeIndex = data->readWrite_idx[1];
 
@@ -114,20 +173,57 @@ int main() {
      data->readWrite_idx[x] = 0;
    }
     data->pos = 0;
+=======
+    printf("here?\n");
+    // int* index_ptr = (int*) (data + SHM_SIZE - 2*sizeof(int));
+    //int index = 0;
+
+
+    int writeIndex = data->readWrite_idx[0];
+    int readIndex = data->readWrite_idx[1];
+
+    /*
+	 * initialize our data to blanks, as initially we have no randomized coin 
+         * toss data! and initialize the position to the first location
+	 * in our circular buffer.
+	 */
+    printf("\n\n AGAIN\n\n");
+	for (int x = 0; x < SHM_SIZE; x++) 
+	{
+	  data->randomChar[x] = 0;
+	}
+    for (int x = 0; x < 2; x++) 
+	{
+	  data->readWrite_idx[x] = 0;
+	}
+    data->pos = 0;
+    printf("!!!%d\n",data->readWrite_idx[1]);
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
 
     while(1) // needs to change get SIGINT??
     {   
         //signal(SIGINT, int_handler);
 
+<<<<<<< HEAD
         if (semop (semID, &acquire_operation, 1) == -1) 
+=======
+        if (semop (data->semid, &acquire_operation, 1) == -1)     // fix to ==1? 
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
         {
             printf ("DP-1 smop error\n");
            exit (4);
         }
         printf("DP-1 SEMA WRITING SEMA : %d \n\n",semID);
 
+<<<<<<< HEAD
         if(data->pos > 255)
         {  
+=======
+        // access the current index of the shared memory buffer
+        data->pos = data->readWrite_idx[1];
+        if(data->pos > 255)
+        {        printf("here?3: %d\n",data->pos);
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
             data->pos = 0;
         }
         // check if ther is enough space to write 20 characters
@@ -140,10 +236,18 @@ int main() {
             max_idx = 20;
         }
         int i = 0;
+<<<<<<< HEAD
         printf("1SEMAPHORE ID: %d \n\n",semID);
         //generate 20 random letters and write all 20 letter into the sharedMemory buffer
         for ( i = 0; i < max_idx; i++) {
    
+=======
+        //generate 20 random letters and write all 20 letter into the sharedMemory buffer
+        for ( i = 0; i < max_idx; i++) {
+            // set Write index to current index
+            //writeIndex = data->pos;
+            
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
             // ===========FIX : CHECK THE NUMBER 30 LATER  =============================
             // if(writeIndex - readIndex <= 30 || readIndex - writeIndex >=230)
             // {   
@@ -155,6 +259,7 @@ int main() {
             // Write the letter to the shared memory buffer
             data->randomChar[data->pos+i]= random_letter;
             printf("%d : %c\n",data->pos+i, data->randomChar[data->pos+i]);
+<<<<<<< HEAD
         
         }
         data->pos += i;
@@ -169,6 +274,25 @@ int main() {
         {
             printf("\n DP-1 RELEASE ERROR\n");
             semctl (semID, 0, IPC_RMID);
+=======
+            
+        }
+        data->pos += i;
+       
+        data->readWrite_idx[1] = data->pos;
+
+
+        // update the current index of the shared memory buffer
+        data->readWrite_idx[1] = data->pos;
+  
+        sleep(2);    //here? or after release semaphore?
+        
+	    //release the semaphore 
+        if (semop (data->semid, &release_operation, 1) == -1) 
+        {
+            printf ("(USER1) GRRRRR.... Can't exit critical region\n");
+            semctl (data->semid, 0, IPC_RMID);
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
             exit (6);
         }
 
@@ -183,3 +307,7 @@ int main() {
     // shmctl(shmID, IPC_RMID, 0);
     return 0;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
