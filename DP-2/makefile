@@ -7,7 +7,7 @@
 
 # FINAL BINARY TARGET
 ./bin/DP-2.o: ./obj/DP-2.o 
-	cc ./obj/DP-2.o ../Common/obj/common.o -o ../Common/bin/DP-2 -lncurses -lpthread
+	cc ./obj/DP-2.o ../Common/obj/common.o -o ./bin/DP-2
 
 # DEPENDENCIES
 ./obj/DP-2.o: ./src/dp-2.c ./inc/dp-2.h
@@ -19,3 +19,4 @@ all: ./bin/DP-2
 
 clean:
 	rm ./obj/*
+	rm ./bin/*

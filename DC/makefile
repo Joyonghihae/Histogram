@@ -7,7 +7,7 @@
 
 # FINAL BINARY TARGET
 ./bin/DC.o: ./obj/DC.o 
-	cc ./obj/DC.o ../Common/obj/common.o -o ../Common/bin/DC -lncurses -lpthread
+	cc ./obj/DC.o ../Common/obj/common.o -o ./bin/DC
 
 # DEPENDENCIES
 ./obj/DC.o: ./src/dc.c ./inc/dc.h
@@ -19,3 +19,4 @@ all: ./bin/DC
 
 clean:
 	rm ./obj/*
+	rm ./bin/*

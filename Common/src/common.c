@@ -17,7 +17,7 @@ void allPowerfulSignalHandler (int signal_number)
     
     case SIGALRM:	
     {
-      signal (SIGALRM, SIG_DFL);
+      alarm (5);
     }
     case SIGINT:	
     {
