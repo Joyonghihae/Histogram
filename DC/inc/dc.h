@@ -4,9 +4,6 @@
 // FIRST VERSION : 2023-04-10
 // DESCRIPTION   : This is a header file for DC
 
-#ifndef __dc_H__
-#define __dc_H__
-
 #include "../../Common/inc/common.h"
 
 #include <stdio.h>
@@ -18,13 +15,20 @@
 #include <stdlib.h>
 #include <signal.h>
 
+
 #define DP1_PID
 #define DP2_PID
+#define SIZE 100
+#define ASCII 20
+#define SHM_SIZE 272 
 
 
-#define SHM_SIZE 258 // for 256 char buffer and 2 indices
+#ifndef __dc_H__
+#define __dc_H__
+unsigned short init_values[1] = { 1 };
+
 struct sembuf acquire_operation = { 0, -1, SEM_UNDO };
 struct sembuf release_operation = { 0, 1, SEM_UNDO };
-void int_handler(int sig);
+
 
 #endif

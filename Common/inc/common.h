@@ -4,8 +4,6 @@
 // FIRST VERSION : 2023-04-10
 // DESCRIPTION   : 
 
-#ifndef __SEMAPHORE_STRUCT_H__
-#define __SEMAPHORE_STRUCT_H__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,11 +14,14 @@
 #include <stdlib.h>
 #include <signal.h>
 
-
-#else
-extern struct sembuf acquire_operation;
-extern struct sembuf release_operation;
-
-#endif
+#define CHAR_SIZE 256
 void alarmHandler(int signal_number);
 void allPowerfulSignalHandler (int signal_number);
+typedef struct dataStruc
+{
+    int pos;
+    int readWrite_idx[2];
+   char randomChar[CHAR_SIZE];
+   char character[CHAR_SIZE];
+    int semid;
+} RANDOMDATA;
