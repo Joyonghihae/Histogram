@@ -14,11 +14,7 @@
 #include <sys/sem.h>
 #include <sys/msg.h>
 
-<<<<<<< HEAD
 
-=======
-#define CHAR_SIZE 256
->>>>>>> e567d9b7416617177ee2b7fcbbe7c09e5dcd38cb
 #define SHM_SIZE 272 
 
 #ifndef __dp_1_H__
