@@ -15,7 +15,6 @@
 #include <signal.h>
 
 #define CHAR_SIZE 256
-void alarmHandler(int signal_number);
 void allPowerfulSignalHandler (int signal_number);
 typedef struct dataStruc
 {

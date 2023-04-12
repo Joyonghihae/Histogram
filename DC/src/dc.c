@@ -11,27 +11,28 @@
  int dp2_pid;
  int shmid;
 
-void int_handler(int sig);
-void alarm_handler(int signal_number);
+
 
 
 void alarm_handler(int signal_number)
 {
   // this is where you could do period work!
   // like saving a file, calculating statistics, etc.
-    printf ("\n2 seconds have elapsed!\n\n");
+    //printf ("\n2 seconds have elapsed!\n\n");
 
-    alarm(2);	// reset alarm
+
+    alarm(2);   // reset alarm
     
 }
 
-int main(int argc, char *argv[]) {
 
+int main(int argc, char *argv[]) {
+    
     int read;
     char buffer[SHM_SIZE];
-    int x;
     RANDOMDATA *data;
     signal(SIGINT, int_handler);
+    signal(SIGALRM, alarm_handler);
     if (argc != 4) {
         exit(1);
     }
@@ -52,99 +53,115 @@ int main(int argc, char *argv[]) {
     int semid = data->semid;
     printf("\nDC Semaphore id : %d\n",semid);
 
-    int writeIndex = data->readWrite_idx[0];
-    int readIndex = data->readWrite_idx[1];
+    int readIndex = data->readWrite_idx[0]-1;
+    int writeIndex = data->readWrite_idx[1];
   
-    char arr[100] = {0};
+    char arr[100] = {0};    // each time 20 * 100
     int j=0;
-    int count[ASCII] = {0};
-    int check;
+
+    int counter = 0;
+    printf("DC semid address: %p \n", &data->semid);
     
     while(1){
-
+        
+        alarm(2); 
+        printf("\nI WOKE UP!!\n");
         // wait for semaphore
         if (semop(data->semid, &acquire_operation, 1) == -1) {
-            perror ("Can't end critical region\n");
+            perror ("DC - Can't end critical region\n");
             
         }
-
-        signal(SIGALRM, alarm_handler);
-        alarm(2); 
-
-        data->pos = data->readWrite_idx[1];
+        
+        counter++;
+        data->pos = data->readWrite_idx[0]; // if it reads until 11, then it should read from 12. -> readIndex = readWritd_idx[0]-1;
         int i= 0;
-        int left = 0;
-        for (i = 0; i < ASCII; i++) {
+
+        for(i = 0; i < 20 ; i++)
+        {
             if(data->pos == 256)
             {
                 data->pos = 0;
             }
-            writeIndex = data->pos;
-        
-            arr[j] = data->randomChar[writeIndex];
-            //Find A~T
-            char letter = arr[j];
-            printf("array: %c\n", arr[j]);
-            count[letter - 'A']++;
-
-            printf("%c-%03d ", i + 'A', count[i]);
-                if(count[i] / 100 != 0){
-                    check = count[i] / 100;
-                    check = check / 10;
-                    for(int z = 0; z < check; z++){
-                        printf("*");
-                    }
-                    check = 0;
-                    check = count[i] % 100;
-                    for(int z =0; z < check; z++){
-                        printf("+");
-                    }
-                    check = 0;
-                    check = count[i] % 10;
-                    for(int z =0; z < check; z++){
-                        printf("-");
-                    }
-                    check = 0;
-                }else if(count[i] / 10 != 0){
-                    check = count[i] / 10;
-                    for(int z = 0; z < check; z++){
-                        printf("+");
-                    }
-                    check = 0;
-                    check = count[i] % 10;
-                    for(int z =0; z < check; z++){
-                        printf("-");
-                    }
-                    check = 0;
-                }else{
-                    check = count[i];
-                    for(int z = 0; z < check; z++){
-                        printf("-");
-                    }
-                    check = 0;
-                }
-
-            printf("\n");  
-
-            readIndex++;
+            arr[j] = data->randomChar[data->pos];
+            data->readWrite_idx[0]=data->pos;
+            printf("DC READ: %d: %c\n",data->pos,arr[j]);            
+            data->pos++;
             j++;
+
         }
 
-        //*(data->character + 257) = readIndex;
+        //update
+        data->readWrite_idx[0] = data->pos;
 
-        data->readWrite_idx[1] = data->pos;
+        printf("DC COUNTER: %d\n\n",counter);
+        if(counter == 5)
+        {
+            histogram(arr);
+            counter = 0;
+        }
 
-        // update the current index of the shared memory buffer
 
         if (semop (data->semid, &release_operation, 1) == -1) 
         {
             printf ("RELEASE\n");
-            break;
         }
         
     }
     shmdt (data);
    return 0;
+}
+
+int histogram(char* arr)
+{
+    //system("clear");
+    int j = 0;
+    int check;
+    int count[ASCII] = {0};
+    for (int i = 0; i < ASCII; i++) {
+        //Find A~T
+        char letter = arr[j];
+        count[letter - 'A']++;
+
+        printf("%c-%03d ", i + 'A', count[i]);
+            if(count[i] / 100 != 0){
+                check = count[i] / 100;
+                check = check / 10;
+                for(int z = 0; z < check; z++){
+                    printf("*");
+                }
+                check = 0;
+                check = count[i] % 100;
+                for(int z =0; z < check; z++){
+                    printf("+");
+                }
+                check = 0;
+                check = count[i] % 10;
+                for(int z =0; z < check; z++){
+                    printf("-");
+                }
+                check = 0;
+            }else if(count[i] / 10 != 0){
+                check = count[i] / 10;
+                for(int z = 0; z < check; z++){
+                    printf("+");
+                }
+                check = 0;
+                check = count[i] % 10;
+                for(int z =0; z < check; z++){
+                    printf("-");
+                }
+                check = 0;
+            }else{
+                check = count[i];
+                for(int z = 0; z < check; z++){
+                    printf("-");
+                }
+                check = 0;
+            }
+
+        printf("\n");  
+        j++;
+    }
 }
 
 void int_handler(int sig) {
@@ -155,5 +172,4 @@ void int_handler(int sig) {
     printf("Shazam!!\n");
     exit(0);
 }
-
 

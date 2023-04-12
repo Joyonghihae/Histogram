@@ -6,28 +6,18 @@
 
 #include "../inc/dp-1.h"
 
-// void int_handler(int sig) {
-    
-//     // Detach from shared memory
-//     shmdt(shm_ptr);
-//     shmdt(semid_ptr);
-    
-//     // Exit with no statement
-//     exit(0);
-    
-// }
-
+RANDOMDATA *data;
+int semID = 0;
 int main() {
     //shared memory var
-    int shmID = 0;
     key_t shmem_key;
     pid_t p;
-    RANDOMDATA *data;
-    int semID = 0;
-    //unsigned int index = 0;
+    int shmID = 0;
 
-    //signal (SIGINT, allPowerfulSignalHandler);
-    
+    //unsigned int index = 0;
+    RANDOMDATA *data;
+    signal (SIGINT, int_handler);
+    timer_t timerID;
   
     // get the secret key_code to the area of shared memory we will allocate 
    shmem_key = ftok (".", 'M');
@@ -115,17 +105,21 @@ int main() {
    }
     data->pos = 0;
 
+    //write = 20
+    //dp -> read and write -> 
+
     while(1) // needs to change get SIGINT??
     {   
         //signal(SIGINT, int_handler);
-
+        
         if (semop (semID, &acquire_operation, 1) == -1) 
         {
             printf ("DP-1 smop error\n");
            exit (4);
         }
+        data->pos = data->readWrite_idx[1];
         printf("DP-1 SEMA WRITING SEMA : %d \n\n",semID);
-
+         printf("[DP1] data update: %d\n", data->pos);
         if(data->pos > 255)
         {  
             data->pos = 0;
@@ -144,7 +138,7 @@ int main() {
         //generate 20 random letters and write all 20 letter into the sharedMemory buffer
         for ( i = 0; i < max_idx; i++) {
    
-            // ===========FIX : CHECK THE NUMBER 30 LATER  =============================
+            // ===========FIX : CHECK THE NUMBER 30 LATER =condition  =============================
             // if(writeIndex - readIndex <= 30 || readIndex - writeIndex >=230)
             // {   
             //     break; // IS THIS RIGHT?
@@ -155,13 +149,13 @@ int main() {
             // Write the letter to the shared memory buffer
             data->randomChar[data->pos+i]= random_letter;
             printf("%d : %c\n",data->pos+i, data->randomChar[data->pos+i]);
-        
+
+
         }
         data->pos += i;
         data->readWrite_idx[1] = data->pos;
         
        
-
         sleep(2);    //here? or after release semaphore?
 
        //release the semaphore 
@@ -171,7 +165,6 @@ int main() {
             semctl (semID, 0, IPC_RMID);
             exit (6);
         }
-
     }
 
 
@@ -182,4 +175,15 @@ int main() {
     // shmdt (semid_ptr);
     // shmctl(shmID, IPC_RMID, 0);
     return 0;
+}
+
+
+void int_handler(int sig) {
+    
+    // Detach from shared memory
+    shmdt(data);
+    semctl (semID, 0, IPC_RMID, 0);
+    // Exit with no statement
+    exit(0);
+    
 }

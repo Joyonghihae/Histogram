@@ -15,14 +15,14 @@
 //     exit(0);
     
 // }
+RANDOMDATA *data;
 
-
+int semID = 0;
 int main(int argc, char *argv[]) {
 
-    int shmID = 0;
     pid_t dc_pid;
-    RANDOMDATA *data;
 
+      int shmID = 0;
     // shared ID does not exist
     if (argc < 2) {
     
@@ -32,6 +32,7 @@ int main(int argc, char *argv[]) {
     shmID = atoi(argv[1]);
     printf("\nDP2 share: %d\n\n",shmID);
 
+    signal (SIGINT, int_handler);
     pid_t dp2_pid = getpid();   
     pid_t dp1_pid = getppid(); 
 
@@ -43,7 +44,7 @@ int main(int argc, char *argv[]) {
     }
  
     // read semaphore ID from shared memory
-    int semID = data->semid;
+    semID = data->semid;
 
     printf("semid address: %p \n", &data->semid);
     printf("pos address: %p \n", &data->pos);
@@ -107,15 +108,12 @@ int main(int argc, char *argv[]) {
         // generate random letter and write to buffer
         char random_letter = (char) ((rand() % 20) + 'A');
         data->randomChar[writeIndex]= random_letter;
-        printf("%d : %c dp-2\n",data->pos, random_letter);
+        printf("%d!!!!!!!!!!!!!!!!!!!!! : %c dp-2\n",data->pos, random_letter);
 
         data->pos++;
-
+        printf("[DP2] data update: %d\n", data->pos);
         // update the current index of the shared memory buffer
         data->readWrite_idx[1] = data->pos;
-
-        // sleep 1/20 second
-        usleep(50000); 
 
         /*
       * release the semaphore - we're leaving the critical region
@@ -126,6 +124,9 @@ int main(int argc, char *argv[]) {
        printf ("     (USER2) RELEASE\n");
        break;
      }
+
+     // sleep 1/20 second
+        usleep(50000); 
 
     }
 
@@ -138,4 +139,14 @@ int main(int argc, char *argv[]) {
     return 0;
 
 
+}
+
+void int_handler(int sig) {
+    
+    // Detach from shared memory
+    shmdt(data);
+    semctl (semID, 0, IPC_RMID, 0);
+    // Exit with no statement
+    exit(0);
+    
 }
